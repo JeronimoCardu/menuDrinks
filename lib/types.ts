@@ -2,21 +2,22 @@ export type ProductCategory =
   | 'drink_500ml'
   | 'drink_1l'
   | 'bottle_combo'
-  | 'promotion';
-
-export type ProductBadge = 'mas_pedido' | 'promo' | 'nuevo';
+  | 'promotion'
+  | 'alcohol-free';
 
 export interface Product {
   id: string;
   name: string;
   description: string | null;
   price: number;
+  cash: number | null;
   image: string | null;
   category: ProductCategory;
-  featured: boolean;
-  badge: ProductBadge | null;
-  active: boolean;
-  display_order: number;
+  featured: boolean | null;
+  badge: boolean | null;
+  active: boolean | null;
+  display_order: number | null;
+  isRedeemable: boolean | null;
   created_at: string;
 }
 
@@ -34,6 +35,7 @@ export const CATEGORY_META: CategoryMeta[] = [
   { id: 'drink_1l', label: 'Tragos 1L', emoji: '🍹' },
   { id: 'bottle_combo', label: 'Combos de Botellas', emoji: '🍾' },
   { id: 'promotion', label: 'Promociones', emoji: '⚡' },
+  { id: 'alcohol-free', label: 'Sin Alcohol', emoji: '🧃' },
 ];
 
 export const CATEGORY_LABELS: Record<ProductCategory, string> = {
@@ -41,12 +43,7 @@ export const CATEGORY_LABELS: Record<ProductCategory, string> = {
   drink_1l: 'Tragos 1L',
   bottle_combo: 'Combos de Botellas',
   promotion: 'Promociones',
-};
-
-export const BADGE_LABELS: Record<ProductBadge, string> = {
-  mas_pedido: 'Más Pedido',
-  promo: 'Promo',
-  nuevo: 'Nuevo',
+  'alcohol-free': 'Sin Alcohol',
 };
 
 export const CATEGORY_ORDER: ProductCategory[] = [
@@ -54,6 +51,7 @@ export const CATEGORY_ORDER: ProductCategory[] = [
   'drink_1l',
   'bottle_combo',
   'promotion',
+  'alcohol-free',
 ];
 
 export function formatPrice(price: number): string {

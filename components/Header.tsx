@@ -67,20 +67,12 @@ export default function Header() {
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="flex flex-col items-center gap-1"
         >
-          {/* Logo mark */}
-          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-night-accentDim border border-night-border mb-1">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-7 h-7 text-night-accentLight"
-            >
-              <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 1 16.5 2.5L13 6l-8.2-1.8-1.4 1.4 6.1 3.6-2.1 2.1-1.8-.4-1.2 1.2 2.8 2.8 2.8 2.8 1.2-1.2-.4-1.8 2.1-2.1 3.6 6.1 1.4-1.4z" />
-            </svg>
-          </div>
+          {/* Logo */}
+          <img
+            src="/logo-aero.png"
+            alt="Complejo Aeropuerto"
+            className="h-28 sm:h-40 md:h-48 object-contain"
+          />
 
           {/* Name */}
           <p className="text-night-accentLight text-xs font-semibold tracking-[0.3em] uppercase">

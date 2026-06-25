@@ -12,14 +12,16 @@ export default async function Home() {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('active', true)
-      .order('display_order', { ascending: true });
+      .order('display_order', { ascending: true, nullsFirst: false });
 
-    if (!error && data) {
-      products = data as Product[];
+    if (error) {
+      console.error('[Supabase] Error fetching products:', error.message);
+    } else if (data) {
+      // Only show products that are not explicitly disabled (null treated as active)
+      products = (data as Product[]).filter((p) => p.active !== false);
     }
-  } catch {
-    // Supabase not configured — render with empty state
+  } catch (err) {
+    console.error('[Supabase] Connection failed:', err);
   }
 
   return <MenuContent initialProducts={products} />;

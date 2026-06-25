@@ -1,16 +1,12 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { GlassWater } from 'lucide-react';
+import { GlassWater, ChevronDown } from 'lucide-react';
 import type { Product } from '@/lib/types';
-import { BADGE_LABELS, formatPrice } from '@/lib/types';
-
-const BADGE_STYLES: Record<string, string> = {
-  mas_pedido: 'bg-night-accent text-white badge-glow',
-  promo: 'bg-emerald-600/90 text-white',
-  nuevo: 'bg-amber-500/90 text-black',
-};
+import { formatPrice } from '@/lib/types';
+import { normalizeImage } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -19,22 +15,28 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index = 0, featured = false }: ProductCardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const hasDescription = !!product.description;
+
   return (
     <motion.article
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.05, ease: 'easeOut' }}
+      transition={{ duration: 0.3, delay: Math.min(index, 8) * 0.04, ease: 'easeOut' }}
+      onClick={() => hasDescription && setExpanded((v) => !v)}
       className={`
         group relative flex flex-col overflow-hidden rounded-2xl
-        bg-night-card border border-night-border card-glow
+        bg-night-card border card-glow
+        ${expanded ? 'border-night-accentLight/50' : 'border-night-border'}
         ${featured ? 'w-48 sm:w-52 flex-shrink-0' : 'w-full'}
+        ${hasDescription ? 'cursor-pointer' : ''}
       `}
     >
-      {/* Image area */}
-      <div className="relative aspect-[4/3] bg-gradient-to-br from-zinc-900 to-night-card overflow-hidden">
-        {product.image ? (
+      {/* Image */}
+      <div className="relative aspect-[4/3] bg-gradient-to-br from-zinc-900 to-night-card overflow-hidden flex-shrink-0">
+        {normalizeImage(product.image) ? (
           <Image
-            src={product.image}
+            src={normalizeImage(product.image)!}
             alt={product.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -44,30 +46,33 @@ export default function ProductCard({ product, index = 0, featured = false }: Pr
           <ImagePlaceholder name={product.name} />
         )}
 
-        {/* Badge */}
         {product.badge && (
-          <span
-            className={`
-              absolute top-2 right-2 z-10
-              px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase
-              ${BADGE_STYLES[product.badge] ?? 'bg-zinc-700 text-white'}
-            `}
-          >
-            {BADGE_LABELS[product.badge]}
+          <span className="absolute top-2 right-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-night-accent text-white badge-glow">
+            Destacado
           </span>
         )}
 
-        {/* Gradient overlay for readability */}
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-night-card to-transparent" />
       </div>
 
       {/* Content */}
       <div className="flex flex-col gap-1 p-3">
-        <h3 className="text-white font-semibold text-sm leading-tight line-clamp-2">
-          {product.name}
-        </h3>
+        <div className="flex items-start justify-between gap-1">
+          <h3 className={`text-white font-semibold text-sm leading-tight ${expanded ? '' : 'line-clamp-2'}`}>
+            {product.name}
+          </h3>
+          {hasDescription && (
+            <motion.span
+              animate={{ rotate: expanded ? 180 : 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex-shrink-0 mt-0.5"
+            >
+              <ChevronDown size={14} className="text-zinc-600" />
+            </motion.span>
+          )}
+        </div>
 
-        {product.description && (
+        {!expanded && hasDescription && (
           <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2">
             {product.description}
           </p>
@@ -77,6 +82,27 @@ export default function ProductCard({ product, index = 0, featured = false }: Pr
           {formatPrice(product.price)}
         </p>
       </div>
+
+      {/* Expanded description */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            key="detail"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.28, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-3 flex flex-col gap-2">
+              <div className="h-px bg-gradient-to-r from-night-border to-transparent" />
+              <p className="text-zinc-400 text-xs leading-relaxed">
+                {product.description}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.article>
   );
 }
