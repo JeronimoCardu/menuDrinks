@@ -3,7 +3,8 @@ export type ProductCategory =
   | 'drink_1l'
   | 'bottle_combo'
   | 'promotion'
-  | 'alcohol-free';
+  | 'alcohol-free'
+  | 'pulsera';
 
 export interface Product {
   id: string;
@@ -44,6 +45,7 @@ export const CATEGORY_LABELS: Record<ProductCategory, string> = {
   bottle_combo: 'Combos de Botellas',
   promotion: 'Promociones',
   'alcohol-free': 'Sin Alcohol',
+  pulsera: 'Pulseras',
 };
 
 export const CATEGORY_ORDER: ProductCategory[] = [

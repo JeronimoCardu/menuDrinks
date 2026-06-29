@@ -52,6 +52,12 @@ export default function ProductCard({ product, index = 0, featured = false }: Pr
           </span>
         )}
 
+        {product.isRedeemable && (
+          <span className="absolute top-2 left-2 z-10 px-2 py-1 rounded-md text-[9px] font-bold tracking-wide uppercase bg-amber-400 text-black shadow-md">
+            🎟 Canjeable
+          </span>
+        )}
+
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-night-card to-transparent" />
       </div>
 
@@ -78,9 +84,17 @@ export default function ProductCard({ product, index = 0, featured = false }: Pr
           </p>
         )}
 
-        <p className="price-gradient font-display text-2xl mt-1 leading-none">
-          {formatPrice(product.price)}
-        </p>
+        <div className="mt-1 flex flex-col gap-0.5">
+          <p className="price-gradient font-display text-2xl leading-none">
+            {formatPrice(product.price)}
+          </p>
+          {product.cash != null && product.cash !== product.price && (
+            <p className="text-green-400 text-sm font-semibold leading-none">
+              {formatPrice(product.cash)}{' '}
+              <span className="text-zinc-600 text-[10px] font-normal">efectivo</span>
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Expanded description */}

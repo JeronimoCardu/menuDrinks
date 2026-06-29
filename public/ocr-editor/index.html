@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Lista de Precios</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Toolbar ──────────────────────────────────────────── -->
+  <header id="toolbar">
+    <div class="toolbar-left">
+      <a href="/admin" class="btn btn-back" title="Volver al panel admin">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Admin
+      </a>
+      <div class="brand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Lista de Precios
+      </div>
+    </div>
+
+    <div id="ocr-status"></div>
+
+    <div class="toolbar-right">
+      <label class="btn btn-ghost" for="file-input" title="Importar imagen">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Importar imagen
+      </label>
+      <input type="file" id="file-input" accept="image/*">
+
+      <button class="btn btn-ghost" id="btn-reanalyze" disabled title="Reanalizar OCR">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Reanalizar OCR
+      </button>
+
+      <button class="btn btn-ghost" id="btn-restore" disabled title="Restaurar último OCR">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+        Restaurar OCR
+      </button>
+
+      <button class="btn btn-save" id="btn-save">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span class="btn-label">Guardar</span>
+      </button>
+
+      <button class="btn btn-primary" id="btn-pdf">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="btn-label">Descargar PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main ─────────────────────────────────────────────── -->
+  <div id="main">
+
+    <!-- Left: image viewer -->
+    <div id="image-panel">
+      <div id="image-topbar">
+        <span class="panel-title">Vista original</span>
+        <div class="zoom-row">
+          <!-- Mobile close button -->
+          <button class="zoom-btn mobile-close-img" id="btn-close-img" title="Cerrar imagen"
+                  onclick="document.getElementById('image-panel').classList.remove('panel-open')"
+                  style="display:none">✕</button>
+          <button id="btn-zoom-out" class="zoom-btn" title="Alejar">−</button>
+          <span id="zoom-label">100%</span>
+          <button id="btn-zoom-in" class="zoom-btn" title="Acercar">+</button>
+          <button id="btn-zoom-fit" class="zoom-btn" title="Ajustar">⊡</button>
+        </div>
+      </div>
+      <div id="image-viewport">
+        <div id="image-inner">
+          <div id="image-placeholder">
+            <div class="ph-icon">🖼</div>
+            <div class="ph-title">Sin imagen</div>
+            <div class="ph-sub">Importá una foto de la lista para analizar con OCR,<br>o editá directamente los datos precargados.</div>
+          </div>
+          <img id="preview-img" alt="Lista original">
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: editor -->
+    <div id="editor-panel">
+
+      <!-- Mobile: show image button (only visible on small screens) -->
+      <button class="btn-show-img" id="btn-toggle-img">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Ver imagen original
+      </button>
+
+      <!-- Doc selector -->
+      <div id="doc-tabs">
+        <button class="doc-tab active" data-doc="mercadopago" onclick="switchDoc('mercadopago')">
+          Mercadopago
+        </button>
+        <button class="doc-tab" data-doc="contado" onclick="switchDoc('contado')">
+          Contado
+        </button>
+      </div>
+
+      <!-- Document header — editable preview of the PDF header -->
+      <div id="doc-header-card">
+        <p class="doc-header-hint">Encabezado del documento <span>· clic para editar</span></p>
+
+        <!-- Línea superior (italic underline, small) -->
+        <input id="input-top-line"
+               class="doc-topline-input"
+               placeholder="Línea superior — ej: VASO GLITTER $12.100">
+
+        <!-- Main box: left = lista, right = pulseras -->
+        <div class="doc-mainbox">
+          <input id="input-main-line"
+                 class="doc-mainbox-left"
+                 placeholder="LISTA MERCADOPAGO">
+          <div class="doc-mainbox-right">
+            <input id="input-pulsera3"
+                   class="doc-pulsera-in"
+                   placeholder="PULSERA X3 $18.700">
+            <span class="doc-sep">—</span>
+            <input id="input-pulsera5"
+                   class="doc-pulsera-in"
+                   placeholder="X5 $30.250">
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div id="cats-wrap"></div>
+
+      <!-- Add category -->
+      <button class="btn-add-cat" id="btn-add-cat">＋ Agregar categoría</button>
+
+    </div>
+  </div>
+
+  <!-- Tesseract for OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- html2canvas for PDF rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

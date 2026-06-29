@@ -128,11 +128,18 @@ function WideProductCard({ product, index }: { product: Product; index: number }
           <h3 className="text-white font-semibold text-sm leading-snug flex-1">
             {product.name}
           </h3>
-          {product.badge && (
-            <span className={`flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${BADGE_STYLE}`}>
-              Destacado
-            </span>
-          )}
+          <div className="flex flex-col gap-1 items-end flex-shrink-0">
+            {product.badge && (
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${BADGE_STYLE}`}>
+                Destacado
+              </span>
+            )}
+            {product.isRedeemable && (
+              <span className="px-2 py-1 rounded-md text-[9px] font-bold tracking-wide uppercase bg-amber-400 text-black shadow-md">
+                🎟 Canjeable
+              </span>
+            )}
+          </div>
         </div>
 
         {product.description && (
@@ -141,9 +148,17 @@ function WideProductCard({ product, index }: { product: Product; index: number }
           </p>
         )}
 
-        <p className="price-gradient font-display text-2xl leading-none">
-          {formatPrice(product.price)}
-        </p>
+        <div className="flex flex-col gap-0.5">
+          <p className="price-gradient font-display text-2xl leading-none">
+            {formatPrice(product.price)}
+          </p>
+          {product.cash != null && product.cash !== product.price && (
+            <p className="text-green-400 text-sm font-semibold leading-none">
+              {formatPrice(product.cash)}{' '}
+              <span className="text-zinc-600 text-[10px] font-normal">efectivo</span>
+            </p>
+          )}
+        </div>
       </div>
     </motion.article>
   );

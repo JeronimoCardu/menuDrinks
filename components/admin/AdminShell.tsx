@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useMemo } from 'react';
-import { Plus, LogOut, Pencil, Trash2, Search, LayoutGrid, LayoutList } from 'lucide-react';
+import { Plus, LogOut, Pencil, Trash2, Search, LayoutGrid, LayoutList, FileText } from 'lucide-react';
 import { logoutAction, deleteProduct, toggleField } from '@/app/admin/actions';
 import { formatPrice, CATEGORY_LABELS } from '@/lib/types';
 import { normalizeImage } from '@/lib/utils';
@@ -121,6 +121,16 @@ export default function AdminShell({ initialProducts }: AdminShellProps) {
               <span><b className="text-emerald-400">{stats.active}</b> activos</span>
               <span><b className="text-night-accentLight">{stats.featured}</b> destacados</span>
             </div>
+
+            <a
+              href="/ocr-editor/index.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 h-9 px-3 rounded-xl border border-night-border text-zinc-400 hover:text-white text-xs font-medium transition-colors shrink-0"
+            >
+              <FileText size={15} />
+              <span className="hidden sm:inline">Lista de Precios</span>
+            </a>
 
             <button
               onClick={() => setFormMode({ type: 'create' })}
