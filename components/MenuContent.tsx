@@ -14,7 +14,6 @@ import Footer from "./Footer";
 const DEFAULT_SORT_FILTER: SortFilterState = {
   sort: null,
   redeemable: false,
-  alcoholFree: false,
 };
 
 interface MenuContentProps {
@@ -27,10 +26,11 @@ export default function MenuContent({ initialProducts }: MenuContentProps) {
   const [sortFilter, setSortFilter] =
     useState<SortFilterState>(DEFAULT_SORT_FILTER);
 
-  // Reset sort/filter when category changes
+  // Reset sort/filter when category changes and scroll back to top
   function handleCategoryChange(cat: ActiveCategory) {
     setActiveCategory(cat);
     setSortFilter(DEFAULT_SORT_FILTER);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const pulseraProducts = useMemo(
@@ -71,11 +71,6 @@ export default function MenuContent({ initialProducts }: MenuContentProps) {
       result = result.filter((p) => p.isRedeemable === true);
     }
 
-    // Alcohol-free filter
-    if (sortFilter.alcoholFree) {
-      result = result.filter((p) => (p.category as string) === "alcohol-free");
-    }
-
     // Sorting — clone before sorting to avoid mutating
     if (sortFilter.sort) {
       result = [...result];
@@ -102,8 +97,7 @@ export default function MenuContent({ initialProducts }: MenuContentProps) {
     !!searchQuery.trim() ||
     activeCategory !== "all" ||
     !!sortFilter.sort ||
-    sortFilter.redeemable ||
-    sortFilter.alcoholFree;
+    sortFilter.redeemable;
 
   const showFeatured = !isFiltered && featuredProducts.length > 0;
 
@@ -115,11 +109,7 @@ export default function MenuContent({ initialProducts }: MenuContentProps) {
       <div className="sticky top-0 z-20 backdrop-blur-md bg-night-bg/90 border-b border-night-border/50">
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
         <CategoryTabs active={activeCategory} onChange={handleCategoryChange} />
-        <SortFilterBar
-          state={sortFilter}
-          onChange={setSortFilter}
-          activeCategory={activeCategory}
-        />
+        <SortFilterBar state={sortFilter} onChange={setSortFilter} />
       </div>
 
       <main className="flex-1 py-4">

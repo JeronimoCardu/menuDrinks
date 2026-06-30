@@ -1,27 +1,20 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import type { ActiveCategory } from '@/lib/types';
 
 export type SortOption = 'price_asc' | 'price_desc' | 'alpha_asc' | 'alpha_desc' | null;
 
 export interface SortFilterState {
   sort: SortOption;
   redeemable: boolean;
-  alcoholFree: boolean;
 }
 
 interface SortFilterBarProps {
   state: SortFilterState;
   onChange: (next: SortFilterState) => void;
-  activeCategory: ActiveCategory;
 }
 
-// Which categories can have alcohol-free products
-const DRINK_CATEGORIES: ActiveCategory[] = ['all', 'drink_500ml', 'drink_1l'];
-
-export default function SortFilterBar({ state, onChange, activeCategory }: SortFilterBarProps) {
-  const showAlcoholFree = DRINK_CATEGORIES.includes(activeCategory);
+export default function SortFilterBar({ state, onChange }: SortFilterBarProps) {
 
   function cyclePrice() {
     const next: SortOption =
@@ -52,7 +45,7 @@ export default function SortFilterBar({ state, onChange, activeCategory }: SortF
   const priceActive = state.sort === 'price_asc' || state.sort === 'price_desc';
   const alphaActive = state.sort === 'alpha_asc' || state.sort === 'alpha_desc';
 
-  const anyActive = priceActive || alphaActive || state.redeemable || state.alcoholFree;
+  const anyActive = priceActive || alphaActive || state.redeemable;
 
   return (
     <div className="px-4 pb-3 flex items-center gap-2 overflow-x-auto scrollbar-hide">
@@ -80,23 +73,13 @@ export default function SortFilterBar({ state, onChange, activeCategory }: SortF
         emoji="🎟️"
       />
 
-      {/* Alcohol-free filter — only for drink categories */}
-      {showAlcoholFree && (
-        <Chip
-          label="Sin alcohol"
-          active={state.alcoholFree}
-          onClick={() => onChange({ ...state, alcoholFree: !state.alcoholFree })}
-          emoji="🧃"
-        />
-      )}
-
       {/* Clear all */}
       {anyActive && (
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
-          onClick={() => onChange({ sort: null, redeemable: false, alcoholFree: false })}
+          onClick={() => onChange({ sort: null, redeemable: false })}
           className="flex-shrink-0 text-zinc-600 hover:text-zinc-400 text-xs underline underline-offset-2 transition-colors ml-1"
         >
           Limpiar
