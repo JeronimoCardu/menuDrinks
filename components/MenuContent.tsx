@@ -147,7 +147,7 @@ function PulseraBanner({ products }: { products: Product[] }) {
           <p className="text-amber-400/70 text-[16px] uppercase tracking-widest font-bold mb-2">
             Pulseras
           </p>
-          <div className="flex flex-wrap gap-5">
+          <div className="flex flex-wrap gap-5 mb-3">
             {items.map((p) => (
               <div key={p.id} className="flex flex-col gap-0.5">
                 <span className="text-zinc-500 text-[10px] uppercase tracking-wide">
@@ -165,6 +165,12 @@ function PulseraBanner({ products }: { products: Product[] }) {
               </div>
             ))}
           </div>
+          <p className="text-zinc-500 text-xs leading-relaxed">
+            Canjeables por los productos marcados con{" "}
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-400/15 text-amber-400 text-[10px] font-bold align-middle">
+              🎟 Canjeable
+            </span>
+          </p>
         </div>
       </div>
     </div>

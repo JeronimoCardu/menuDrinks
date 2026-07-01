@@ -47,6 +47,12 @@ export default function Footer() {
         <p className="text-zinc-800 text-[10px]">
           Menú digital · Escaneá el QR en el local
         </p>
+        {/* Author */}
+        <p className="text-zinc-800 text-[10px]">
+          Desarrollado por <a href="https://www.linkedin.com/in/jeronimocardu" target="_blank" rel="noopener noreferrer" className="text-night-accentLight hover:text-night-accentDark ">
+            Jeronimo Cardu
+          </a>
+        </p>
       </div>
     </footer>
   );
