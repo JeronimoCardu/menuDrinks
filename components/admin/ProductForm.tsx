@@ -14,6 +14,7 @@ const CATEGORIES = [
   { value: 'bottle_combo', label: 'Combos de Botellas' },
   { value: 'promotion', label: 'Promociones' },
   { value: 'alcohol-free', label: 'Sin Alcohol' },
+  { value: 'pulsera', label: 'Pulseras' },
 ];
 
 type Mode = 'create' | 'edit';
@@ -22,7 +23,7 @@ interface ProductFormProps {
   mode: Mode;
   initialData?: Partial<ProductPayload> & { id?: string };
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (savedProduct: Record<string, unknown>) => void;
 }
 
 const EMPTY: ProductPayload = {
@@ -101,17 +102,32 @@ export default function ProductForm({ mode, initialData, onClose, onSuccess }: P
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    startTransition(async () => {
-      const result =
-        mode === 'create'
-          ? await createProduct(form)
-          : await updateProduct(initialData!.id!, form);
 
-      if (result?.error) {
-        setError(result.error);
+    if (!form.price || form.price <= 0) {
+      setError('El precio es requerido y debe ser mayor a 0.');
+      return;
+    }
+
+    startTransition(async () => {
+      if (mode === 'edit') {
+        const result = await updateProduct(initialData!.id!, form);
+        if (result?.error) {
+          setError(result.error);
+          return;
+        }
+        onSuccess({ id: initialData!.id, ...form } as Record<string, unknown>);
       } else {
-        onSuccess();
-        onClose();
+        const result = await createProduct(form);
+        if (result?.error) {
+          setError(result.error);
+          return;
+        }
+        const saved = (result as { data: Record<string, unknown> | null }).data;
+        if (!saved?.id) {
+          setError('Error al crear el producto. Intentá de nuevo.');
+          return;
+        }
+        onSuccess(saved);
       }
     });
   }
@@ -236,12 +252,13 @@ export default function ProductForm({ mode, initialData, onClose, onSuccess }: P
             <Field label="Precio *">
               <input
                 type="number"
-                value={form.price}
-                onChange={(e) => set('price', Number(e.target.value))}
-                required
-                min={0}
+                value={form.price > 0 ? form.price : ''}
+                onChange={(e) =>
+                  set('price', e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)))
+                }
+                min={1}
                 className={INPUT}
-                placeholder="0"
+                placeholder="Ej: 3500"
               />
             </Field>
             <Field label="Precio efectivo">

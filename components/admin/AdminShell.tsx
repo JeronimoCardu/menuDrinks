@@ -14,6 +14,7 @@ const CATEGORY_COLOR: Record<string, string> = {
   bottle_combo: 'bg-amber-900/50 text-amber-300',
   promotion: 'bg-emerald-900/50 text-emerald-300',
   'alcohol-free': 'bg-teal-900/50 text-teal-300',
+  pulsera: 'bg-amber-900/50 text-amber-200',
 };
 
 function catLabel(cat: string): string {
@@ -244,7 +245,23 @@ export default function AdminShell({ initialProducts }: AdminShellProps) {
           mode={formMode.type}
           initialData={formMode.type === 'edit' ? normalizeProductForForm(formMode.product) : undefined}
           onClose={() => setFormMode(null)}
-          onSuccess={() => window.location.reload()}
+          onSuccess={(saved) => {
+            if (formMode.type === 'create') {
+              const product = saved as unknown as Product;
+              if (product?.id) {
+                setProducts((prev) => [...prev, product]);
+              }
+            } else {
+              const updated = {
+                ...formMode.product,
+                ...(saved as unknown as Partial<Product>),
+              } as Product;
+              setProducts((prev) =>
+                prev.map((p) => (p.id === updated.id ? updated : p))
+              );
+            }
+            setFormMode(null);
+          }}
         />
       )}
     </div>
@@ -299,10 +316,11 @@ function AdminProductCard({
         </div>
 
         {/* Toggles */}
-        <div className="grid grid-cols-3 gap-1.5">
-          <MiniToggle label="Activo" value={p.active !== false} color="emerald" onToggle={() => onToggle(p.id, 'active', p.active)} disabled={isPending} />
-          <MiniToggle label="Dest." value={!!p.featured} color="purple" onToggle={() => onToggle(p.id, 'featured', p.featured)} disabled={isPending} />
-          <MiniToggle label="Badge" value={!!p.badge} color="amber" onToggle={() => onToggle(p.id, 'badge', p.badge)} disabled={isPending} />
+        <div className="grid grid-cols-2 gap-1.5">
+          <MiniToggle label="Activo"  value={p.active !== false} color="emerald" onToggle={() => onToggle(p.id, 'active', p.active)}       disabled={isPending} />
+          <MiniToggle label="Dest."   value={!!p.featured}       color="purple"  onToggle={() => onToggle(p.id, 'featured', p.featured)}    disabled={isPending} />
+          <MiniToggle label="Badge"   value={!!p.badge}          color="amber"   onToggle={() => onToggle(p.id, 'badge', p.badge)}          disabled={isPending} />
+          <MiniToggle label="Canj."   value={!!p.isRedeemable}   color="sky"     onToggle={() => onToggle(p.id, 'isRedeemable', p.isRedeemable)} disabled={isPending} />
         </div>
       </div>
     </div>
@@ -333,10 +351,11 @@ function AdminTableRow({
             </span>
             <span className="price-gradient font-display text-base leading-none">{formatPrice(p.price)}</span>
           </div>
-          <div className="flex gap-1.5 mt-2">
-            <MiniToggle label="Activo" value={p.active !== false} color="emerald" onToggle={() => onToggle(p.id, 'active', p.active)} disabled={isPending} />
-            <MiniToggle label="Dest." value={!!p.featured} color="purple" onToggle={() => onToggle(p.id, 'featured', p.featured)} disabled={isPending} />
-            <MiniToggle label="Badge" value={!!p.badge} color="amber" onToggle={() => onToggle(p.id, 'badge', p.badge)} disabled={isPending} />
+          <div className="grid grid-cols-2 gap-1.5 mt-2">
+            <MiniToggle label="Activo" value={p.active !== false} color="emerald" onToggle={() => onToggle(p.id, 'active', p.active)}           disabled={isPending} />
+            <MiniToggle label="Dest."  value={!!p.featured}       color="purple"  onToggle={() => onToggle(p.id, 'featured', p.featured)}       disabled={isPending} />
+            <MiniToggle label="Badge"  value={!!p.badge}          color="amber"   onToggle={() => onToggle(p.id, 'badge', p.badge)}             disabled={isPending} />
+            <MiniToggle label="Canj."  value={!!p.isRedeemable}   color="sky"     onToggle={() => onToggle(p.id, 'isRedeemable', p.isRedeemable)} disabled={isPending} />
           </div>
         </div>
         <div className="flex gap-1 shrink-0">
@@ -383,6 +402,7 @@ const COLOR_MAP: Record<string, string> = {
   emerald: 'bg-emerald-700 border-emerald-600 text-emerald-200',
   purple:  'bg-night-accentDim border-night-accentLight/50 text-night-accentLight',
   amber:   'bg-amber-900/60 border-amber-600/50 text-amber-300',
+  sky:     'bg-sky-900/60 border-sky-600/50 text-sky-300',
 };
 
 function MiniToggle({ label, value, color, onToggle, disabled }: { label: string; value: boolean; color: string; onToggle: () => void; disabled: boolean }) {

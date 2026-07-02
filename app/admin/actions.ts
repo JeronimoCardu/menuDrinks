@@ -61,17 +61,25 @@ export interface ProductPayload {
 }
 
 export async function createProduct(payload: ProductPayload) {
-  const { error } = await db().from('products').insert([payload]);
+  const { data, error } = await db()
+    .from('products')
+    .insert([payload])
+    .select();
   if (error) return { error: error.message };
   revalidatePath('/');
   revalidatePath('/admin');
+  return { data: data?.[0] ?? null };
 }
 
 export async function updateProduct(id: string, payload: Partial<ProductPayload>) {
-  const { error } = await db().from('products').update(payload).eq('id', id);
+  const { error } = await db()
+    .from('products')
+    .update(payload)
+    .eq('id', id);
   if (error) return { error: error.message };
   revalidatePath('/');
   revalidatePath('/admin');
+  return { data: { id, ...payload } };
 }
 
 export async function deleteProduct(id: string) {
